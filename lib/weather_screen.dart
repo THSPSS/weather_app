@@ -1,9 +1,43 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:weather_app/additional_info_item.dart';
+import 'package:weather_app/hourly_forecase_itme.dart';
+import 'package:http/http.dart' as http;
+import 'package:weather_app/secrets.dart';
 
-class WeatherScreen extends StatelessWidget {
+class WeatherScreen extends StatefulWidget {
   const WeatherScreen({super.key});
+
+  @override
+  State<WeatherScreen> createState() => _WeatherScreenState();
+}
+
+class _WeatherScreenState extends State<WeatherScreen> {
+
+
+  Future getCurrentWeather() async {
+    try {
+      String lat = '35.891621';
+      String lon = '128.619415';
+      final result = await http.get(
+      Uri.parse('https://api.openweathermap.org/data/3.0/onecall?lat=$lat&lon=$lon&appid=$openWeatherAPIKey')    
+      );
+      final data = jsonDecode(result.body);
+      if(data['cod'].toString() != 'null') {
+        throw 'An unexpected error occured';
+      }
+      print('main weather ${data['current']['weather'][0]['main']}');
+      print('main weather description ${data['current']['weather'][0]['description']}');
+
+      return data;
+     } catch(e) {
+      throw e.toString();
+     }
+
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,177 +56,129 @@ class WeatherScreen extends StatelessWidget {
             icon: const Icon(Icons.refresh))
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          // crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            //using placeholder , fallbackheight : if widget does not have child than it takes fallbackheight
-            // Container(
-            //   padding: const EdgeInsetsDirectional.all(20.0),
-            //   width: double.infinity,
-            //   decoration: BoxDecoration(
-            //     borderRadius: BorderRadius.circular(10.0),
-            //     color: Colors.white12,
-            //   ),
-            //   child: const Column(
-            //     children: [
-            //       Text('300.67F', 
-            //         style : TextStyle(
-            //           fontWeight: FontWeight.w600,
-            //           fontSize: 35.0
-            //       )),
-            //       SizedBox(height: 15.0,),
-            //       Icon(Icons.cloud , size : 60.0),
-            //       SizedBox(height: 15.0,),
-            //       Text('Rain' , style: TextStyle(fontSize: 18.0))
-            //     ],
-            //   ),
-            // ),
-            Container(
-              width: double.infinity,
-              child: const Card(
-                child: Column(
+      body: FutureBuilder(
+        future: getCurrentWeather(),
+        builder: (context , snapshot) {
+          print('snapshot $snapshot');
+          print(snapshot.runtimeType);
+          //snapshot catches the state of future function (in this case get Current Weather)
+          if(snapshot.connectionState == ConnectionState.waiting) {
+            //instead of showing CircularProgressIndicator
+            //showing shimmer loading animation
+            return const Center(child: CircularProgressIndicator());
+          }
+          return Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            //set text titles to positioned from start
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(2.0),
+                child: Container(
+                  width: double.infinity,
+                  height: 180,
+                  decoration: BoxDecoration(
+                    color: Colors.white10,
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                ),
+              ),
+              //using placeholder , fallbackheight : if widget does not have child than it takes fallbackheight
+              // Container(
+              //   padding: const EdgeInsetsDirectional.all(20.0),
+              //   width: double.infinity,
+              //   decoration: BoxDecoration(
+              //     borderRadius: BorderRadius.circular(10.0),
+              //     color: Colors.white12,
+              //   ),
+              //   child: const Column(
+              //     children: [
+              //       Text('300.67F', 
+              //         style : TextStyle(
+              //           fontWeight: FontWeight.w600,
+              //           fontSize: 35.0
+              //       )),
+              //       SizedBox(height: 15.0,),
+              //       Icon(Icons.cloud , size : 60.0),
+              //       SizedBox(height: 15.0,),
+              //       Text('Rain' , style: TextStyle(fontSize: 18.0))
+              //     ],
+              //   ),
+              // ),
+              SizedBox(
+                width: double.infinity,
+                child: Card(
+                  elevation: 10,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.0)
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX : 10 , sigmaY: 10),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                             Text(
+                              '200 K' ,
+                              style : const TextStyle(fontSize: 32 , fontWeight: FontWeight.bold)
+                             ),
+                             const SizedBox(height: 16,),
+                             Icon(Icons.cloud , size : 64),
+                             const SizedBox(height: 16,),
+                             Text('Rain',
+                             style : TextStyle(fontSize: 20)
+                             ),
+                        ],),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20.0,),
+              //weather forecase section
+              const Text(
+                'Weather Forecase',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                  )
+              ),
+              const SizedBox(height: 10.0,),
+              const SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
                   children: [
-                     Text('300.67°F',
-                     style : TextStyle(fontSize: 32 , fontWeight: FontWeight.bold)
-                     ),
+                  HourlyForecaseItem(time: '09:00' , icon: Icons.cloud , temperature: '301.22'),
+                  HourlyForecaseItem(time: '09:30' , icon: Icons.sunny , temperature: '300.00'),
+                  HourlyForecaseItem(time: '10:00' , icon: Icons.sunny , temperature: '302.21'),
+                  HourlyForecaseItem(time: '10:30' , icon: Icons.cloud , temperature: '280.43'),
+                  HourlyForecaseItem(time: '11:00' , icon: Icons.cloud , temperature: '300.32')
                 ],),
               ),
-            ),
-            const SizedBox(height: 10.0,),
-            //weather forecase section
-            const Text('Weather Forecase',
-                style: TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                )
-            ),
-            const SizedBox(height: 10.0,),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
+              const SizedBox(height: 20.0,),
+              //Additional Information
+              const Text('Additional Information',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                  )
+              ),
+              const SizedBox(height: 10.0,),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                Container(width: 100, height: 100,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0), 
-                  color: Colors.white10,
-                  )
-                ,child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('09:00'),
-                    Icon(Icons.cloud),
-                    Text('301.09')
-                ],),
-                ),
-                const SizedBox(width: 10.0,),
-                Container(width: 100, height: 100,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0), 
-                  color: Colors.white10,
-                  )
-                ,child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('09:00'),
-                    Icon(Icons.cloud),
-                    Text('301.09')
-                ],),
-                ),
-                const SizedBox(width: 10.0,),
-                Container(width: 100, height: 100,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0), 
-                  color: Colors.white10,
-                  )
-                ,child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('09:00'),
-                    Icon(Icons.cloud),
-                    Text('301.09')
-                ],),
-                ),
-                const SizedBox(width: 10.0,),
-                Container(width: 100, height: 100,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0), 
-                  color: Colors.white10,
-                  )
-                ,child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('09:00'),
-                    Icon(Icons.cloud),
-                    Text('301.09')
-                ],),
-                ),
-                const SizedBox(width: 10.0,),
-                      Container(width: 100, height: 100,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0), 
-                  color: Colors.white10,
-                  )
-                ,child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('09:00'),
-                    Icon(Icons.cloud),
-                    Text('301.09')
-                ],),
-                ),
-              ],),
-            ),
-            const SizedBox(height: 10.0,),
-            //Additional Information
-            const Text('Additional Information',
-                style: TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                )
-            ),
-            const SizedBox(height: 10.0,),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                SizedBox(
-                  width: 100, 
-                  height: 100,
-                  child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.water_drop),
-                    Text('Humidity'),
-                    Text('94', style: TextStyle(fontWeight: FontWeight.bold))
-                ],),
-                ),
-                SizedBox(
-                  width: 100, 
-                  height: 100,
-                  child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.wind_power),
-                    Text('Wind Speed'),
-                    Text('7.67' , style: TextStyle(fontWeight: FontWeight.bold))
-                ],),
-                ),
-                SizedBox(
-                  width: 100, 
-                  height: 100,
-                  child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.umbrella),
-                    Text('Pressure'),
-                    Text('1006' , style: TextStyle(fontWeight: FontWeight.bold))
-                ],),
-                ),
-              ],
-            ),
-          ],
-        ),
+                  AdditionalInfoItme(icon: Icons.water_drop, label: 'Humidity' , value: '91'),
+                  AdditionalInfoItme(icon: Icons.air, label: 'Wind Speed' , value: '7.5'),
+                  AdditionalInfoItme(icon: Icons.beach_access, label: 'Pressure' , value: '1000'),
+                ],
+              ),
+            ],
+          ),
+        );
+        },
       )
     );
   }
