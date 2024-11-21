@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:ui';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:weather_app/additional_info_item.dart';
 import 'package:weather_app/hourly_forecase_itme.dart';
 import 'package:http/http.dart' as http;
+import 'package:weather_app/loading_container.dart';
 import 'package:weather_app/secrets.dart';
+import 'package:weather_app/shimmer_loading.dart';
 
 class WeatherScreen extends StatefulWidget {
   const WeatherScreen({super.key});
@@ -73,17 +76,25 @@ class _WeatherScreenState extends State<WeatherScreen> {
             //set text titles to positioned from start
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(2.0),
-                child: Container(
-                  width: double.infinity,
-                  height: 180,
-                  decoration: BoxDecoration(
-                    color: Colors.white10,
-                    borderRadius: BorderRadius.circular(16.0),
-                  ),
+              const LoadingContainer(height: 180),
+              const SizedBox(height: 20,),
+              const LoadingContainer(width: 200, height: 20),
+              const SizedBox(height: 10,),
+              const SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    LoadingContainer(width: 100, height: 110),
+                    LoadingContainer(width: 100, height: 110),
+                    LoadingContainer(width: 100, height: 110),
+                    LoadingContainer(width: 100, height: 110),
+                  ],
                 ),
               ),
+              const SizedBox(height: 20,),
+              const LoadingContainer(width: 220, height: 20),
+              const SizedBox(height: 10,),
+              const LoadingContainer(height: 150),
               //using placeholder , fallbackheight : if widget does not have child than it takes fallbackheight
               // Container(
               //   padding: const EdgeInsetsDirectional.all(20.0),
@@ -117,17 +128,17 @@ class _WeatherScreenState extends State<WeatherScreen> {
                     borderRadius: BorderRadius.circular(16),
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX : 10 , sigmaY: 10),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                      child: const Padding(
+                        padding: EdgeInsets.all(8.0),
                         child: Column(
                           children: [
                              Text(
                               '200 K' ,
-                              style : const TextStyle(fontSize: 32 , fontWeight: FontWeight.bold)
+                              style : TextStyle(fontSize: 32 , fontWeight: FontWeight.bold)
                              ),
-                             const SizedBox(height: 16,),
+                             SizedBox(height: 16,),
                              Icon(Icons.cloud , size : 64),
-                             const SizedBox(height: 16,),
+                             SizedBox(height: 16,),
                              Text('Rain',
                              style : TextStyle(fontSize: 20)
                              ),
