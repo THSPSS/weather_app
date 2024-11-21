@@ -68,19 +68,13 @@ class _WeatherScreenState extends State<WeatherScreen> {
           if(snapshot.connectionState == ConnectionState.waiting) {
             //instead of showing CircularProgressIndicator
             //showing shimmer loading animation
-            return const Center(child: CircularProgressIndicator());
-          }
-          return Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            //set text titles to positioned from start
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const LoadingContainer(height: 180),
-              const SizedBox(height: 20,),
-              const LoadingContainer(width: 200, height: 20),
-              const SizedBox(height: 10,),
-              const SingleChildScrollView(
+            return const Column(
+              children: [
+              LoadingContainer(height: 180),
+              SizedBox(height: 20,),
+              LoadingContainer(width: 200, height: 20),
+              SizedBox(height: 10,),
+              SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
@@ -91,10 +85,19 @@ class _WeatherScreenState extends State<WeatherScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20,),
-              const LoadingContainer(width: 220, height: 20),
-              const SizedBox(height: 10,),
-              const LoadingContainer(height: 150),
+              SizedBox(height: 20,),
+              LoadingContainer(width: 220, height: 20),
+              SizedBox(height: 10,),
+              LoadingContainer(height: 150),
+              ],
+            );
+          }
+          return Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            //set text titles to positioned from start
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               //using placeholder , fallbackheight : if widget does not have child than it takes fallbackheight
               // Container(
               //   padding: const EdgeInsetsDirectional.all(20.0),

@@ -14,9 +14,8 @@ class ShimmerLoading extends StatefulWidget {
   State<ShimmerLoading> createState() => _ShimmerLoadingState();
 }
 
-class _ShimmerLoadingState extends State<ShimmerLoading>  with SingleTickerProviderStateMixin  {
+class _ShimmerLoadingState extends State<ShimmerLoading>  {
 
-  
   static const _shimmerGradient = LinearGradient(
   colors: [
     Color(0xFFEBEBF4),
@@ -33,43 +32,18 @@ class _ShimmerLoadingState extends State<ShimmerLoading>  with SingleTickerProvi
   tileMode: TileMode.clamp,
 );
 
- @override
-  void initState() {
-    super.initState();
-    late final AnimationController _controller;
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
-    )..repeat();
-  }
-
-    @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-
-
   @override
   Widget build(BuildContext context) {
     if (!widget.isLoading) {
       return widget.child;
     }
 
-    return AnimatedBuilder(
-      animation:  _controller,
-      builder:(context , child) => ShaderMask(
-        blendMode: BlendMode.srcATop,
-        shaderCallback: (bounds) {
-          final double dx = bounds.width * _controller.value;
-          return _shimmerGradient.createShader(
-            //bounds
-            Rect.fromLTWH(-dx, 0, bounds.width * 2, bounds.height)
-            );
-        },
-        child: widget.child,
-      ),
+    return ShaderMask(
+      blendMode: BlendMode.srcATop,
+      shaderCallback: (bounds) {
+        return _shimmerGradient.createShader(bounds);
+      },
+      child: widget.child,
     );
   }
 }

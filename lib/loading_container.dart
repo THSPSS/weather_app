@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:weather_app/shimmer_loading.dart';
 
 class LoadingContainer extends StatelessWidget {
@@ -12,16 +13,16 @@ class LoadingContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ShimmerLoading(
-      //for test stage code
-      isLoading: true,
+    return Shimmer.fromColors(
+                    baseColor: Colors.white10,
+                    highlightColor: Colors.white,
       child: Padding(
                   padding: const EdgeInsets.all(2.0),
                   child: Container(
                     width: width ?? double.infinity,
                     height: height,
                     decoration: BoxDecoration(
-                      color: Colors.grey[300],
+                      color: Colors.black38,
                       borderRadius: BorderRadius.circular(16.0),
                     ),
                   )
