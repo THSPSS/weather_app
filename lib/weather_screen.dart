@@ -97,9 +97,22 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
           final data = snapshot.data!;
 
-          final currentTemp = data['current']['temp'];
-          final currentMain = data['current']['weather'][0]['main'];
+          final currentWeather = data['current'];
 
+          final currentTemp = currentWeather['temp'];
+          final currentMain = currentWeather['weather'][0]['main'];
+          final currentHumidity = currentWeather['humidity'];
+          final currentWindSpeed = currentWeather['wind_speed'];
+          final currentPressure = currentWeather['pressure'];
+
+          final hourlyWeatherItem = data['hourly'];
+
+          //get hourly data and check current time and hourly dt. and houry dt is bigger than current time,
+          //so it can be forecast weather
+          //if hourly dt is bigger than current dt. than save it to list where store dt, temp , weather[0]['main'] data
+          //store it for 5 hourly forecast
+          //and stop the for loop
+          //show it on UI 
           return Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
@@ -162,7 +175,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
               const SizedBox(height: 20.0,),
               //weather forecase section
               const Text(
-                'Weather Forecase',
+                'Hourly Forecase',
                   style: TextStyle(
                     fontSize: 20.0,
                     fontWeight: FontWeight.bold,
@@ -189,12 +202,12 @@ class _WeatherScreenState extends State<WeatherScreen> {
                   )
               ),
               const SizedBox(height: 10.0,),
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  AdditionalInfoItme(icon: Icons.water_drop, label: 'Humidity' , value: '91'),
-                  AdditionalInfoItme(icon: Icons.air, label: 'Wind Speed' , value: '7.5'),
-                  AdditionalInfoItme(icon: Icons.beach_access, label: 'Pressure' , value: '1000'),
+                  AdditionalInfoItme(icon: Icons.water_drop, label: 'Humidity' , value: currentHumidity.toString() ),
+                  AdditionalInfoItme(icon: Icons.air, label: 'Wind Speed' , value: currentWindSpeed.toString()),
+                  AdditionalInfoItme(icon: Icons.beach_access, label: 'Pressure' , value: currentPressure.toString()),
                 ],
               ),
             ],
