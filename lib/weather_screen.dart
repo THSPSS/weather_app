@@ -1,14 +1,11 @@
 import 'dart:convert';
 import 'dart:ui';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:weather_app/additional_info_item.dart';
 import 'package:weather_app/hourly_forecase_itme.dart';
 import 'package:http/http.dart' as http;
 import 'package:weather_app/loading_container.dart';
 import 'package:weather_app/secrets.dart';
-import 'package:weather_app/shimmer_loading.dart';
 
 class WeatherScreen extends StatefulWidget {
   const WeatherScreen({super.key});
@@ -20,7 +17,7 @@ class WeatherScreen extends StatefulWidget {
 class _WeatherScreenState extends State<WeatherScreen> {
 
 
-  Future getCurrentWeather() async {
+  Future<Map<String,dynamic>> getCurrentWeather() async {
     try {
       String lat = '35.891621';
       String lon = '128.619415';
@@ -68,6 +65,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
           if(snapshot.connectionState == ConnectionState.waiting) {
             //instead of showing CircularProgressIndicator
             //showing shimmer loading animation
+            //CircularProfressIndicator.adaptive
             return const Column(
               children: [
               LoadingContainer(height: 180),
@@ -92,6 +90,16 @@ class _WeatherScreenState extends State<WeatherScreen> {
               ],
             );
           }
+
+          if(snapshot.hasError) {
+            return Center(child: Text(snapshot.error.toString()));
+          }
+
+          final data = snapshot.data!;
+
+          final currentTemp = data['current']['temp'];
+          final currentMain = data['current']['weather'][0]['main'];
+
           return Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
@@ -131,19 +139,19 @@ class _WeatherScreenState extends State<WeatherScreen> {
                     borderRadius: BorderRadius.circular(16),
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX : 10 , sigmaY: 10),
-                      child: const Padding(
-                        padding: EdgeInsets.all(8.0),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
                         child: Column(
                           children: [
                              Text(
-                              '200 K' ,
-                              style : TextStyle(fontSize: 32 , fontWeight: FontWeight.bold)
+                              '$currentTemp K' ,
+                              style : const TextStyle(fontSize: 32 , fontWeight: FontWeight.bold)
                              ),
-                             SizedBox(height: 16,),
-                             Icon(Icons.cloud , size : 64),
-                             SizedBox(height: 16,),
-                             Text('Rain',
-                             style : TextStyle(fontSize: 20)
+                             const SizedBox(height: 16,),
+                             Icon(currentMain == 'cloud' || currentMain == 'Rain' ? Icons.cloud : Icons.sunny, size : 64),
+                             const SizedBox(height: 16,),
+                             Text(currentMain,
+                             style : const TextStyle(fontSize: 20)
                              ),
                         ],),
                       ),

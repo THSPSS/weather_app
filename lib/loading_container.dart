@@ -14,8 +14,8 @@ class LoadingContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-                    baseColor: Colors.white10,
-                    highlightColor: Colors.white,
+      baseColor: Colors.white54,
+      highlightColor: Colors.white12,
       child: Padding(
                   padding: const EdgeInsets.all(2.0),
                   child: Container(
