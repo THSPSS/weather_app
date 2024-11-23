@@ -59,8 +59,6 @@ class _WeatherScreenState extends State<WeatherScreen> {
       body: FutureBuilder(
         future: getCurrentWeather(),
         builder: (context , snapshot) {
-          print('snapshot $snapshot');
-          print(snapshot.runtimeType);
           //snapshot catches the state of future function (in this case get Current Weather)
           if(snapshot.connectionState == ConnectionState.waiting) {
             //instead of showing CircularProgressIndicator
@@ -106,12 +104,29 @@ class _WeatherScreenState extends State<WeatherScreen> {
           final currentPressure = currentWeather['pressure'];
 
           final hourlyWeatherItem = data['hourly'];
+          final List<String> hourlydateTime = [];
+          final List<String> hourlyMain = [];
+          final List<String> hourlyTemp = [];
 
+          //nowtime
+          print(DateTime.now().millisecondsSinceEpoch);
           //get hourly data and check current time and hourly dt. and houry dt is bigger than current time,
-          //so it can be forecast weather
-          //if hourly dt is bigger than current dt. than save it to list where store dt, temp , weather[0]['main'] data
-          //store it for 5 hourly forecast
-          //and stop the for loop
+          for(var i = 0 ; i < 5 ; i++) {
+            print(hourlyWeatherItem[i]['dt']);
+            print(hourlyWeatherItem[i]['temp'].toString());
+            print(hourlyWeatherItem[i]['weather'][0]['main']);
+            DateTime seoulTime = DateTime.fromMillisecondsSinceEpoch(hourlyWeatherItem[i]['dt'] * 1000, isUtc: true).add(const Duration(hours: 9));
+
+            // Format as hh:mm
+            String formattedTime = "${seoulTime.hour.toString().padLeft(2, '0')}:${seoulTime.minute.toString().padLeft(2, '0')}";
+            print("Seoul Time: $formattedTime");
+
+            hourlydateTime.add(formattedTime);
+            hourlyTemp.add(hourlyWeatherItem[i]['temp'].toString());
+            hourlyMain.add(hourlyWeatherItem[i]['weather'][0]['main']);
+          }
+          //store each data on list 
+          //convert dt to hh:mm format
           //show it on UI 
           return Padding(
           padding: const EdgeInsets.all(10.0),
