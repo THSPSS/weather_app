@@ -120,6 +120,8 @@ class _WeatherScreenState extends State<WeatherScreen> {
             // Format as hh:mm
             String formattedTime = "${seoulTime.hour.toString().padLeft(2, '0')}:${seoulTime.minute.toString().padLeft(2, '0')}";
             print("Seoul Time: $formattedTime");
+            print("hourlyWeatherItem[i]['temp'].toString(): ${hourlyWeatherItem[i]['temp'].toString()}");
+            print("hourlyWeatherItem[i]['weather'][0]['main']: ${hourlyWeatherItem[i]['weather'][0]['main']}");
 
             hourlydateTime.add(formattedTime);
             hourlyTemp.add(hourlyWeatherItem[i]['temp'].toString());
@@ -197,15 +199,21 @@ class _WeatherScreenState extends State<WeatherScreen> {
                   )
               ),
               const SizedBox(height: 10.0,),
-              const SingleChildScrollView(
+              SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                  HourlyForecaseItem(time: '09:00' , icon: Icons.cloud , temperature: '301.22'),
-                  HourlyForecaseItem(time: '09:30' , icon: Icons.sunny , temperature: '300.00'),
-                  HourlyForecaseItem(time: '10:00' , icon: Icons.sunny , temperature: '302.21'),
-                  HourlyForecaseItem(time: '10:30' , icon: Icons.cloud , temperature: '280.43'),
-                  HourlyForecaseItem(time: '11:00' , icon: Icons.cloud , temperature: '300.32')
+                    ListView.builder(
+                      itemCount: hourlydateTime.length,
+                      itemBuilder: (BuildContext context, int index) {
+                         return HourlyForecaseItem(time: hourlydateTime[index], icon: Icons.sunny , temperature: hourlyTemp[index]);
+                      },
+                    ),
+                  // HourlyForecaseItem(time: '09:00' , icon: Icons.cloud , temperature: '301.22'),
+                  // HourlyForecaseItem(time: '09:30' , icon: Icons.sunny , temperature: '300.00'),
+                  // HourlyForecaseItem(time: '10:00' , icon: Icons.sunny , temperature: '302.21'),
+                  // HourlyForecaseItem(time: '10:30' , icon: Icons.cloud , temperature: '280.43'),
+                  // HourlyForecaseItem(time: '11:00' , icon: Icons.cloud , temperature: '300.32')
                 ],),
               ),
               const SizedBox(height: 20.0,),
