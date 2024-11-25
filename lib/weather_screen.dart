@@ -105,23 +105,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
           final currentPressure = currentWeather['pressure'];
 
           final hourlyWeatherItem = data['hourly'];
-          final List<String> hourlydateTime = [];
-          final List<String> hourlyMain = [];
-          final List<String> hourlyTemp = [];
-
-          //get hourly data and check current time and hourly dt. and houry dt is bigger than current time,
-          for(var i = 0 ; i < 5 ; i++) {
-            DateTime seoulTime = DateTime.fromMillisecondsSinceEpoch(hourlyWeatherItem[i]['dt'] * 1000, isUtc: true).add(const Duration(hours: 9));
-
-            // Format as hh:mm
-            String formattedTime = "${seoulTime.hour.toString().padLeft(2, '0')}:${seoulTime.minute.toString().padLeft(2, '0')}";
-
-            hourlydateTime.add(formattedTime);
-            hourlyTemp.add(hourlyWeatherItem[i]['temp'].toString());
-            hourlyMain.add(hourlyWeatherItem[i]['weather'][0]['main']);
-            //hourlyForecastList.add(HourlyForecaseItem(time: formattedTime , icon: Icons.sunny , temperature: hourlyWeatherItem[i]['temp'].toString()));
-          }
-
+          
           //store each data on list 
           //convert dt to hh:mm format
           //show it on UI 
@@ -178,9 +162,15 @@ class _WeatherScreenState extends State<WeatherScreen> {
                 height: 120,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: hourlydateTime.length,
-                  itemBuilder: (BuildContext context , int index) {
-                    return HourlyForecaseItem(time: hourlydateTime[index] , icon: hourlyMain[index] == 'Clouds' || hourlyMain[index] == 'Rain' ? Icons.cloud : Icons.sunny , temperature: hourlyTemp[index].toString());
+                  itemCount: 5,
+                  itemBuilder: (BuildContext context , int i) {
+
+                    DateTime seoulTime = DateTime.fromMillisecondsSinceEpoch(hourlyWeatherItem[i]['dt'] * 1000, isUtc: true).add(const Duration(hours: 9));
+
+                   // Format as hh:mm
+                    String formattedTime = "${seoulTime.hour.toString().padLeft(2, '0')}:${seoulTime.minute.toString().padLeft(2, '0')}";
+   
+                    return HourlyForecaseItem(time: formattedTime , icon: hourlyWeatherItem[i]['weather'][0]['main'] == 'Clouds' || hourlyWeatherItem[i]['weather'][0]['main'] == 'Rain' ? Icons.cloud : Icons.sunny , temperature: hourlyWeatherItem[i]['temp'].toString());
                   }
                   ),
               ),
