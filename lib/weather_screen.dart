@@ -51,7 +51,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
           //icon button set its own padding and splash effect along with icon shape
           IconButton(
             onPressed: (){
-              print('refresh');
+              setState(() {});
             }, 
             icon: const Icon(Icons.refresh))
         ],
@@ -65,6 +65,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
             //showing shimmer loading animation
             //CircularProfressIndicator.adaptive
             return const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
               LoadingContainer(height: 180),
               SizedBox(height: 20,),
@@ -108,25 +109,19 @@ class _WeatherScreenState extends State<WeatherScreen> {
           final List<String> hourlyMain = [];
           final List<String> hourlyTemp = [];
 
-          //nowtime
-          print(DateTime.now().millisecondsSinceEpoch);
           //get hourly data and check current time and hourly dt. and houry dt is bigger than current time,
           for(var i = 0 ; i < 5 ; i++) {
-            print(hourlyWeatherItem[i]['dt']);
-            print(hourlyWeatherItem[i]['temp'].toString());
-            print(hourlyWeatherItem[i]['weather'][0]['main']);
             DateTime seoulTime = DateTime.fromMillisecondsSinceEpoch(hourlyWeatherItem[i]['dt'] * 1000, isUtc: true).add(const Duration(hours: 9));
 
             // Format as hh:mm
             String formattedTime = "${seoulTime.hour.toString().padLeft(2, '0')}:${seoulTime.minute.toString().padLeft(2, '0')}";
-            print("Seoul Time: $formattedTime");
-            print("hourlyWeatherItem[i]['temp'].toString(): ${hourlyWeatherItem[i]['temp'].toString()}");
-            print("hourlyWeatherItem[i]['weather'][0]['main']: ${hourlyWeatherItem[i]['weather'][0]['main']}");
 
             hourlydateTime.add(formattedTime);
             hourlyTemp.add(hourlyWeatherItem[i]['temp'].toString());
             hourlyMain.add(hourlyWeatherItem[i]['weather'][0]['main']);
+            //hourlyForecastList.add(HourlyForecaseItem(time: formattedTime , icon: Icons.sunny , temperature: hourlyWeatherItem[i]['temp'].toString()));
           }
+
           //store each data on list 
           //convert dt to hh:mm format
           //show it on UI 
@@ -137,27 +132,6 @@ class _WeatherScreenState extends State<WeatherScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               //using placeholder , fallbackheight : if widget does not have child than it takes fallbackheight
-              // Container(
-              //   padding: const EdgeInsetsDirectional.all(20.0),
-              //   width: double.infinity,
-              //   decoration: BoxDecoration(
-              //     borderRadius: BorderRadius.circular(10.0),
-              //     color: Colors.white12,
-              //   ),
-              //   child: const Column(
-              //     children: [
-              //       Text('300.67F', 
-              //         style : TextStyle(
-              //           fontWeight: FontWeight.w600,
-              //           fontSize: 35.0
-              //       )),
-              //       SizedBox(height: 15.0,),
-              //       Icon(Icons.cloud , size : 60.0),
-              //       SizedBox(height: 15.0,),
-              //       Text('Rain' , style: TextStyle(fontSize: 18.0))
-              //     ],
-              //   ),
-              // ),
               SizedBox(
                 width: double.infinity,
                 child: Card(
@@ -178,7 +152,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                               style : const TextStyle(fontSize: 32 , fontWeight: FontWeight.bold)
                              ),
                              const SizedBox(height: 16,),
-                             Icon(currentMain == 'cloud' || currentMain == 'Rain' ? Icons.cloud : Icons.sunny, size : 64),
+                             Icon(currentMain == 'Clouds' || currentMain == 'Rain' ? Icons.cloud : Icons.sunny, size : 64),
                              const SizedBox(height: 16,),
                              Text(currentMain,
                              style : const TextStyle(fontSize: 20)
@@ -199,22 +173,16 @@ class _WeatherScreenState extends State<WeatherScreen> {
                   )
               ),
               const SizedBox(height: 10.0,),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    ListView.builder(
-                      itemCount: hourlydateTime.length,
-                      itemBuilder: (BuildContext context, int index) {
-                         return HourlyForecaseItem(time: hourlydateTime[index], icon: Icons.sunny , temperature: hourlyTemp[index]);
-                      },
-                    ),
-                  // HourlyForecaseItem(time: '09:00' , icon: Icons.cloud , temperature: '301.22'),
-                  // HourlyForecaseItem(time: '09:30' , icon: Icons.sunny , temperature: '300.00'),
-                  // HourlyForecaseItem(time: '10:00' , icon: Icons.sunny , temperature: '302.21'),
-                  // HourlyForecaseItem(time: '10:30' , icon: Icons.cloud , temperature: '280.43'),
-                  // HourlyForecaseItem(time: '11:00' , icon: Icons.cloud , temperature: '300.32')
-                ],),
+              SizedBox(
+                width: MediaQuery.of(context).size.width,
+                height: 120,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: hourlydateTime.length,
+                  itemBuilder: (BuildContext context , int index) {
+                    return HourlyForecaseItem(time: hourlydateTime[index] , icon: hourlyMain[index] == 'Clouds' || hourlyMain[index] == 'Rain' ? Icons.cloud : Icons.sunny , temperature: hourlyTemp[index].toString());
+                  }
+                  ),
               ),
               const SizedBox(height: 20.0,),
               //Additional Information
